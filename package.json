@@ -1,0 +1,23 @@
+{
+  "name": "rust-snake",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "dist": "dist"
+  },
+  "scripts": {
+    "dev": "rsw watch & vite",
+    "rsw": "rsw",
+    "build": "rsw build && npm run fe:build",
+    "fe:build": "tsc && vite build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "5.4.3",
+    "vite": "^5.2.6",
+    "vite-plugin-rsw": "^2.0.11"
+  }
+}
