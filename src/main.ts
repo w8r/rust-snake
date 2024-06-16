@@ -1,4 +1,4 @@
-import x, { initSync, printx, greet } from "../rust/snake/pkg";
+import x, { initSync, World } from "../rust/snake/pkg";
 
 (async () => {
   const c = await x();
@@ -15,7 +15,9 @@ import x, { initSync, printx, greet } from "../rust/snake/pkg";
     },
   };
 
-  const { printx } = initSync(importObject);
-  printx(42);
-  console.log(greet("pidor"));
+  const x1 = initSync(importObject);
+  console.log({ x1 });
+
+  const world = World.new(5, 5);
+  console.log(world, world.width());
 })();
