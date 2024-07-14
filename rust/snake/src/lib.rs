@@ -7,74 +7,99 @@ use wee_alloc::WeeAlloc;
 #[global_allocator]
 static ALLOC: WeeAlloc = WeeAlloc::INIT;
 
-#[wasm_bindgen]
-pub struct World {
-    width: usize,
-    height: usize,
-    snake: Snake,
+#[derive(PartialEq)]
+enum Direction {
+    Up,
+    Right,
+    Down,
+    Left
 }
 
+#[wasm_bindgen]
+extern {
+    fn alert(s: &str);
+    fn console_log(s: &str);
+}
+
+struct SnakeCell(usize);
 
 struct Snake {
-    x: i32,
-    y: i32,
-    dx: i32,
-    dy: i32,
-    tail: Vec<(i32, i32)>,
+    body: Vec<SnakeCell>,
+    direction: Direction,
 }
 
 impl Snake {
-    fn new(width: usize, height: usize) -> Snake {
+    fn new(spawn_index: usize) -> Snake {
         Snake {
-            x: width as i32 / 2,
-            y: height as i32 / 2,
-            dx: 0,
-            dy: 0,
-            tail: Vec::new(),
+            body: vec!(SnakeCell(spawn_index)),
+            direction: Direction::Up,
         }
     }
+}
 
-    fn update(&mut self) {
-        self.x += self.dx;
-        self.y += self.dy;
-    }
+#[wasm_bindgen]
+pub struct World {
+    width: usize,
+    size: usize,
+    snake: Snake,
 }
 
 #[wasm_bindgen]
 impl World {
-    pub fn new(width: usize, height: usize) -> World {
+    pub fn new(width: usize, snake_idx: usize) -> World {
         World {
             width,
-            height,
-            snake: Snake::new(width, height),
+            size: width * width,
+            snake: Snake::new(snake_idx)
         }
-    }
-
-    pub fn update(&mut self) {
-        self.snake.update();
     }
 
     pub fn width(&self) -> usize {
         self.width
     }
+
+    pub fn snake_head_idx(&self) -> usize {
+       self.snake.body[0].0
+    }
+
+    pub fn update(&mut self) {
+        let snake_idx = self.snake_head_idx();
+        let (row, col) = self.index_to_cell(snake_idx);
+        let (row, col) = match self.snake.direction {
+            Direction::Right => {
+                (row, (col + 1) % self.width)
+            },
+            Direction::Left => {
+                (row, (col - 1) % self.width)
+            },
+            Direction::Up => {
+                ((row - 1) % self.width, col)
+            },
+            Direction::Down => {
+                ((row +1) % self.width, col)
+            },
+        };
+
+        println!("row: {}, col: {}", row, col);
+        let next_idx = self.cell_to_index(row, col);
+        self.set_snake_head(next_idx);
+    }
+
+    fn set_snake_head(&mut self, idx: usize) {
+        self.snake.body[0].0 = idx;
+    }
+
+    fn index_to_cell(&self, idx: usize) -> (usize, usize) {
+        (idx / self.width, idx % self.width)
+    }
+
+    fn cell_to_index(&self, row: usize, col: usize) -> usize {
+        (row * self.width) + col
+    }
 }
 
-// #[wasm_bindgen]
-// pub fn printx(x: i32) -> i32 {
-//     return x + 142;
-// }
+#[wasm_bindgen]
+pub fn greet(str: &str) {
+    console_log(str);
+}
 
-// #[wasm_bindgen]
-// pub fn greet(str: &str) {
-//     alert(str);
-// }
-
-// #[wasm_bindgen]
-// extern {
-//     fn alert(s: &str);
-// }
-
-// fn main() {
-//     let str = "Hello, world!";
-//     println!("{}", str);
-// }
