@@ -3,4 +3,7 @@ import { ViteRsw } from "vite-plugin-rsw";
 
 export default defineConfig({
   plugins: [ViteRsw()],
+  build: {
+    target: "esnext",
+  },
 });

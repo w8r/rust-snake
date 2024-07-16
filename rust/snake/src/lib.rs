@@ -59,7 +59,7 @@ impl World {
     }
 
     pub fn snake_head_idx(&self) -> usize {
-       self.snake.body[0].0
+        self.snake.body[0].0
     }
 
     pub fn update(&mut self) {
@@ -70,10 +70,18 @@ impl World {
                 (row, (col + 1) % self.width)
             },
             Direction::Left => {
-                (row, (col - 1) % self.width)
+                if(col == 0) {
+                    (row, self.width - 1)
+                } else {
+                    (row, col - 1)
+                }
             },
             Direction::Up => {
-                ((row - 1) % self.width, col)
+                if(row == 0) {
+                    (self.width - 1, col)
+                } else {
+                    (row - 1, col)
+                }
             },
             Direction::Down => {
                 ((row +1) % self.width, col)
